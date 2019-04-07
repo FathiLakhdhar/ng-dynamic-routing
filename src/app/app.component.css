@@ -1,0 +1,13 @@
+nav> a{
+    margin: 2px;
+}
+
+a.active{
+    color: green;
+}
+
+
+footer{
+    background-color: #eee;
+    padding: 5px;
+}

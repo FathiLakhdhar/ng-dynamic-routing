@@ -1,0 +1,15 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<ul>
+  <li>Menu</li>
+  <li *ngFor="let link of links | async"><a [routerLink]="getPath(link.path)" routerLinkActive="active">{{link.label}}</a></li>
+</ul>
+
+<router-outlet></router-outlet>
+
+
+<footer>
+    <nav [hidden]="isMonoApp">
+      <!--<a routerLink="/welcome" routerLinkActive="active">Welcome</a>-->
+      <a *ngFor="let i of instances" (click)="selectInstance(i)" [ngClass]="{'active': i.id == activeInstance.id}">{{i.label}}</a>
+    </nav>    
+</footer>
