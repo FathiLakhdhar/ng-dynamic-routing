@@ -15,7 +15,6 @@ export class MultiAppComponent implements OnInit, AfterViewInit, AfterViewChecke
     navigation: any[];
     constructor(private route: ActivatedRoute, private _navService: NavigationService) {
         this.navigation = this._navService.navigation;
-        this._navService.isMonoApp.next(false);
         /*this.route.params.subscribe( params =>{
             if(this.navigation[params.instance]){
                 // LOAD Links

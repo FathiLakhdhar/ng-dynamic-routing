@@ -11,20 +11,19 @@ import { ActiveInstanceService } from './services/activeInstance.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  navigation: any[];
   links: Observable<any[]>;
   isMonoApp: boolean;
-  instances: any[]= [];
+  instances: any[]=  [{
+    id: "ST1",
+    label: "ST1",
+  },{
+    id: "ST2",
+    label: "ST2",
+  }];
   activeInstance: any = {};
 
   constructor(private _navService: NavigationService, private route: Router, private activeInstanceService: ActiveInstanceService){
-    this.navigation = this._navService.navigation
-    Object.keys(this.navigation).forEach(key=>{
-      this.instances.push({
-        id: key,
-        label: key,
-      })
-    })
+    
     this.links = this._navService.links.asObservable();
     
     this.route.events.subscribe(event=>{
@@ -44,7 +43,10 @@ export class AppComponent implements OnInit {
         this.selectInstance(this.instances[0])
       }
     })
-    this.activeInstanceService.activeInstance.subscribe(i=>{this.activeInstance=i});
+    this.activeInstanceService.activeInstance.subscribe(i=>{
+      //console.log(i)
+      this.activeInstance=i
+    });
   }
 
 
@@ -53,8 +55,9 @@ export class AppComponent implements OnInit {
   }
 
   selectInstance(i){
-    this.activeInstanceService.activeInstance.next(i);
-    this._navService.buildRoutes(this.navigation[i.id], true);
+    this._navService.loadNavigation(i.id).then(()=>{
+      this.activeInstanceService.activeInstance.next(i);
+    })
   }
 
  

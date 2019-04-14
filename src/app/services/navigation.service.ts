@@ -1,9 +1,10 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Injector  } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import * as navigation from '../data/navigation';
 import {entryComponentsMap} from '../entry-components';
 import { BehaviorSubject } from 'rxjs';
-import { ROUTES } from '../routes'
+import { ROUTES } from '../routes';
 
 @Injectable()
 export class NavigationService {
@@ -11,44 +12,66 @@ export class NavigationService {
     links: BehaviorSubject<any[]> = new BehaviorSubject([]);
     isMonoApp: BehaviorSubject<boolean> = new BehaviorSubject(false);
     private children = [];
-    constructor(private _router: Router){
-        this.navigation = navigation.data;
+    constructor(private _injector: Injector, private _http: HttpClient){
     }
 
-    buildRoutes(nav, reset: boolean) {
-        this.children = this.buildChildren(nav);
+    buildRoutes(menu, reset: boolean) {
+        this.children = this.buildChildren(menu);
         this.links.next(this.children)
         this.addRouteChildren(this.children, reset);
+    }
+
+    loadNavigation(instanceId: string){
+      let url = `http://localhost/cdch/navigation.php?instanceId=${instanceId}`
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            this._http.get(url)
+            .subscribe(
+              (response: any[]) => {
+                this.navigation = response;
+                this.buildRoutes(this.navigation, true);
+                resolve(true);
+              },
+              err => {
+                console.log(err);
+                reject(false);
+              }
+            );
+         });
+        });
     }
 
     private buildNavLinks(){
 
     }
 
-    buildChildren(obj){
-        function iter(r, p) {
+    buildChildren(menu){
+      function iter(r, p) {
           var children = r.children;
           if (children && children.length) {
             return children.forEach(x => iter(x, p.concat(r.id)));
           }else{p.push(r.id)}
-          result.push({
-            label: r.label,
-            path: p.join('/'), 
-            selector: r.selector
-          });
+  
+          let x = r;
+          x.path = p.join('/')
+          result.push(x)
         }
         var result = [];
-        iter(obj, []);
+        menu.forEach(m=>{
+            iter(m, []);
+        });
         return result;
-      }
+  }
 
       resetRoutes(){
-        this._router.resetConfig(ROUTES);
+        //this._router.resetConfig(ROUTES);
       }
     
     
       addRouteChildren(children: any[], reset: boolean) {
-        let routerConfig = reset? ROUTES : this._router.config;
+        const router = this._injector.get(Router);
+        console.log(router);
+        let routerConfig = router.config;
         routerConfig[0].children = [];
         routerConfig[1].children = [];
         children.forEach(r=>{
@@ -61,6 +84,6 @@ export class NavigationService {
             component: entryComponentsMap[r.selector]
           });
         })
-        this._router.resetConfig(routerConfig);
+        router.resetConfig(routerConfig);
       }
 }

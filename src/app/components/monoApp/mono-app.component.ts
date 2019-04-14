@@ -14,15 +14,17 @@ import { ActiveInstanceService } from 'src/app/services/activeInstance.service';
 export class MonoAppComponent implements OnInit, AfterViewInit, AfterViewChecked {
     
     navigation: any[];
+
     constructor(private route: ActivatedRoute, private _navService: NavigationService, private activeInstanceService: ActiveInstanceService) {
         this.navigation = this._navService.navigation;
-        this._navService.isMonoApp.next(true);
         this.route.params.subscribe( params =>{
-            if(this.navigation[params.instance]){
+            console.log(params)
+            if(params.instance != activeInstanceService.activeInstance.getValue().id){
                 // LOAD Links
                 console.log("// LOAD Links")
-                this.activeInstanceService.activeInstance.next({id: params.instance, label: params.instance})
-                this._navService.buildRoutes(this.navigation[params.instance], true);
+                this._navService.loadNavigation(params.instance).then(()=>{
+                    this.activeInstanceService.activeInstance.next({id: params.instance, label: params.instance})
+                });
             }
         })
     }

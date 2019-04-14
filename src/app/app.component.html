@@ -10,6 +10,6 @@
 <footer>
     <nav [hidden]="isMonoApp">
       <!--<a routerLink="/welcome" routerLinkActive="active">Welcome</a>-->
-      <a *ngFor="let i of instances" (click)="selectInstance(i)" [ngClass]="{'active': i.id == activeInstance.id}">{{i.label}}</a>
+      <a *ngFor="let i of instances" (click)="selectInstance(i)" [ngClass]="{'active': i.id == activeInstance?.id}">{{i.label}}</a>
     </nav>    
 </footer>
